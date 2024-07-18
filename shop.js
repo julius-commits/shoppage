@@ -1,9 +1,12 @@
 import { apicall } from "./apicalls.js";
+import { createCartItem } from "./displayFunctions.js";
 
+let cart = [];
 let cartIcon = document.getElementById("cart_id");
 let overlay = document.querySelector(".overlay");
 let card_container = document.getElementById("items");
 let modal_content = document.querySelector(".modal-content");
+
 overlay.addEventListener("click", () => {
   overlay.style.display = "none";
 });
@@ -13,13 +16,10 @@ cartIcon.addEventListener("click", () => {
 });
 
 modal_content.addEventListener("click", (e) => {
-  console.log(e);
   e.stopPropagation();
 });
 
-//function which shows items inside card
-
-let showCartItems = (cart) => {
+let showCartItems = () => {
   modal_content.innerHTML = "";
   cart.forEach((item) => {
     let { image, title, price } = item;
@@ -39,85 +39,26 @@ let showCartItems = (cart) => {
   });
 };
 
-let addItemToCart = (product) => {
-  let isItemInCart = cart.find((item) => {
-    return (product.id = item.id);
-  });
-  if (itemIsInCart) {
-    cart.push({ ...product, item_quantity });
-    showCartItems();
+export let addItemToCart = (product) => {
+  let isItemInCart = cart.find((item) => product.id === item.id);
+  if (!isItemInCart) {
+    cart.push({ ...product, item_quantity: 1 });
   } else {
-    cart.map((item) => {
-      if ((item.id = product.id)) {
-        return { ...product, item_quantity: item.item_quantity++ };
-      } else {
-        return item;
-      }
-    });
+    cart = cart.map((item) =>
+      item.id === product.id
+        ? { ...item, item_quantity: item.item_quantity + 1 }
+        : item
+    );
   }
-  console.log(isItemInCart, "its already in the cart");
+  showCartItems();
+  console.log(cart, "Cart updated");
 };
 
 window.onload = () => {
-  console.log(apicall);
   apicall()
     .then((data) => {
       data.forEach((product) => {
-        let card = document.createElement("div");
-        card.classList = "card";
-        card_container.appendChild(card);
-        //creating image cart
-        let img_container = document.createElement("div");
-        let product_img = document.createElement("img");
-        product_img.id = "img";
-
-        let { title, price, image } = product;
-
-        product_img.src = image;
-        img_container.appendChild(product_img);
-        card.appendChild(img_container);
-        // create button and adding to card
-        let btn_container = document.createElement("div");
-        let addBtn = document.createElement("button");
-        addBtn.textContent = "Add to the cart";
-
-        addBtn.addEventListener("click", () => {
-          cart.push(product);
-          showCartItems();
-        });
-
-        let card_name = document.createElement("div");
-        let title_p = document.createElement("p");
-        let price_p = document.createElement("p");
-        card_name.classList = "card-name";
-        card_name.appendChild(title_p);
-        card_name.appendChild(price_p);
-        title_p.textContent = title;
-        price_p.textContent = price;
-        card.appendChild(card_name);
-        card_container.appendChild(card);
-        console.log(product);
-
-        let star_main = document.createElement("div");
-        let star1 = document.createElement("img");
-        let star2 = document.createElement("img");
-        let star3 = document.createElement("img");
-        let star4 = document.createElement("img");
-        let star5 = document.createElement("img");
-        star_main.classList = "stars-icon";
-        star1.src = "./star.png";
-        star2.src = "./star.png";
-        star3.src = "./star.png";
-        star4.src = "./star.png";
-        star5.src = "./star.png";
-        star_main.appendChild(star1);
-        star_main.appendChild(star2);
-        star_main.appendChild(star3);
-        star_main.appendChild(star4);
-        star_main.appendChild(star5);
-        btn_container.appendChild(addBtn);
-        card.appendChild(btn_container);
-        card.appendChild(star_main);
+        createCartItem(product);
       });
     })
     .catch(() => alert("We are working on it!!"));
