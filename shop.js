@@ -30,10 +30,18 @@ let showCartItems = () => {
     cartItem.classList = "cart_item";
     cart_img.id = "cart-item-img";
     cart_img.classList = "cart-item-img";
-    cart_img_container.classList = "card-item-img-container";
+    cart_img_container.classList = "cart_img_container";
     cart_img.src = image;
     cart_img_container.appendChild(cart_img);
     cartItem.appendChild(cart_img_container);
+    deleteBtn.textContent = "x";
+    deleteBtn.addEventListener("click", () => {
+      let updatedcart = cart.filter((cartItem) => {
+        return cartItem.id !== item.id;
+      });
+
+      console.log("delete this item", updatedcart);
+    });
     cartItem.appendChild(deleteBtn);
     modal_content.appendChild(cartItem);
   });
