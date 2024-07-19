@@ -1,5 +1,6 @@
 import { apicall } from "./apicalls.js";
 import { createCartItem } from "./displayFunctions.js";
+import { SaveCartInLocalStorage } from "./utilizefunction.js";
 
 let cart = [];
 let cartIcon = document.getElementById("cart_id");
@@ -35,14 +36,16 @@ let showCartItems = () => {
     cart_img_container.appendChild(cart_img);
     cartItem.appendChild(cart_img_container);
     deleteBtn.textContent = "x";
-    deleteBtn.addEventListener("click", () => {
-      let updatedcart = cart.filter((cartItem) => {
-        return cartItem.id !== item.id;
-      });
-
-      console.log("delete this item", updatedcart);
-    });
+    deleteBtn.style.backgroundColor = "red";
     cartItem.appendChild(deleteBtn);
+    deleteBtn.addEventListener("click", () => {
+      cart = cart.filter((cartItem_) => {
+        return cartItem_.id != item.id;
+      });
+      SaveCartInLocalStorage(cart);
+      showCartItems();
+    });
+
     modal_content.appendChild(cartItem);
   });
 };
@@ -51,12 +54,15 @@ export let addItemToCart = (product) => {
   let isItemInCart = cart.find((item) => product.id === item.id);
   if (!isItemInCart) {
     cart.push({ ...product, item_quantity: 1 });
+    SaveCartInLocalStorage(cart);
+    showCartItems();
   } else {
     cart = cart.map((item) =>
       item.id === product.id
         ? { ...item, item_quantity: item.item_quantity + 1 }
         : item
     );
+    SaveCartInLocalStorage(cart);
   }
   showCartItems();
   console.log(cart, "Cart updated");
